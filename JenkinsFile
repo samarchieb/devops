@@ -10,7 +10,7 @@ pipeline {
         stage('Build Angular') {
             steps {
                 sh 'npm install'
-                sh 'ng build'
+                sh 'ng serve'
             }
         }
         stage('Build Spring Boot') {
