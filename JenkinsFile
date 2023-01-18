@@ -1,41 +1,34 @@
 pipeline {
-  agent any
-  tools {nodejs "node"}
+    agent any
     stages {
-    stage('Checkout') {
-      steps {
-        script {
-           git branch: 'main', credentialsId: 'SAMAR', url: 'https://github.com/samarchieb/devops.git'
-           sh "ls -lart ./*"  
-           sh "git branch -a"
-          }
-       }
-    }
-    stage('INSTALL') {
-      steps {
-        dir("CHAYAANI-FRONTEND") {
-                echo 'INSTALL'
-                sh "npm install"
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/samarchieb/devops.git'
             }
-          }
         }
-    stage('BUILD-CHAYAANI') {
-      steps {
-        dir("CHAYAANI-FRONTEND") {
-            echo 'BUILD-CHAYAANI'
-            sh "npm run-script build"
+        stage('Build Angular') {
+            steps {
+                sh 'npm install'
+                sh 'ng build'
+            }
         }
-      }
+        stage('Build Spring Boot') {
+            steps {
+                sh './mvnw clean package'
+            }
+        }
+        stage('Docker Build and Push') {
+            steps {
+                withDockerRegistry([credentialsId: 'SAMAR', url: 'https://hub.docker.com/u/samarchieb']) {
+                    sh 'docker build -t my_image_name .'
+                    sh 'docker push my_image_name'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'kubectl apply -f k8s/deployment.yaml'
+            }
+        }
     }
-    stage('TEST-CHAYAANI') {
-      steps {
-        dir("CHAYAANI-FRONTEND") {
-            echo 'TEST-CHAYAANI'
-            sh "apt-get update"
-            sh "npm run-script test"
-        }
-      }
-    }
-  }
 }
-
