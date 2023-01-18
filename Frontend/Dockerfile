@@ -1,21 +1,9 @@
-FROM node:16.14-alpine As build
-
+FROM node:latest as node
 # set working directory
 WORKDIR /app
 
-# add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-
-RUN npm install -g @angular/cli
-
-# install and cache app dependencies
-COPY package.json /app/package.json
-RUN npm install
-
-# add app
 COPY . .
-
-# generate build
+RUN npm install --save --legacy-peer-deps
 RUN npm run build --prod
 
 EXPOSE 4200
