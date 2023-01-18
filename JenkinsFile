@@ -12,7 +12,7 @@ pipeline {
         }
         stage('Init'){
             steps{
-                bat 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
 
@@ -20,22 +20,22 @@ pipeline {
       
         stage('Build') {
             steps {
-                bat 'cd Front end (Angular) && docker build -t samarchieb/frontend:latest .'
-                bat 'cd Back end (SpringBoot) && docker build -t samarchieb/backend:latest .'
+                sh 'cd Front end (Angular) && docker build -t samarchieb/frontend:latest .'
+                sh 'cd Back end (SpringBoot) && docker build -t samarchieb/backend:latest .'
             }
         }
         stage('Deliver') {
             steps {
-                bat 'docker push samarchieb/frontend:latest'
-                bat 'docker push samarchieb/backend:latest'
+                sh 'docker push samarchieb/frontend:latest'
+                sh 'docker push samarchieb/backend:latest'
             }
         }
           stage('Cleanup') {
             steps {
-                bat 'docker system prune -f'
-               // bat 'docker rmi samarchieb/frontend:latest'
-               // bat 'docker rmi samarchieb/backend:latest'
-                bat 'docker logout'
+                sh'docker system prune -f'
+               // sh 'docker rmi samarchieb/frontend:latest'
+               // sh 'docker rmi samarchieb/backend:latest'
+                sh 'docker logout'
             }
         }
          
