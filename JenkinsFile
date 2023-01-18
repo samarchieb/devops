@@ -20,8 +20,8 @@ pipeline {
       
         stage('Build') {
             steps {
-                sh 'cd Front end (Angular) && docker build -t samarchieb/frontend:latest .'
-                sh 'cd Back end (SpringBoot) && docker build -t samarchieb/backend:latest .'
+                sh 'cd Frontend && docker build -t samarchieb/frontend:latest .'
+                sh 'cd Backend && docker build -t samarchieb/backend:latest .'
             }
         }
         stage('Deliver') {
