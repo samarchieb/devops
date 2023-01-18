@@ -1,35 +1,44 @@
 pipeline {
     agent any
+      environment {
+        DOCKERHUB_CREDENTIALS = credentials('dh_cred')
+    }
+
     stages {
         stage('Checkout') {
             steps {
-		git branch: 'main', 
-                 url: 'https://github.com/samarchieb/devops.git'
+                git url: 'https://github.com/samarchieb/devops.git', branch: 'main'
             }
         }
-        stage('Build Angular') {
+        stage('Init'){
+            steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
+
+        
+      
+        stage('Build') {
             steps {
-                sh 'npm install'
-                sh 'ng serve'
+                sh 'cd Front end (Angular) && docker build -t samarchieb/frontend:latest .'
+                sh 'cd Back end (SpringBoot) && docker build -t samarchieb/backend:latest .'
             }
         }
-        stage('Build Spring Boot') {
+        stage('Deliver') {
             steps {
-                sh './mvnw clean package'
+                sh 'docker push samarchieb/frontend:latest'
+                sh 'docker push samarchieb/backend:latest'
             }
         }
-        stage('Docker Build and Push') {
+          stage('Cleanup') {
             steps {
-                withDockerRegistry([credentialsId: 'SAMAR', url: 'https://hub.docker.com/u/samarchieb']) {
-                    sh 'docker build -t my_image_name .'
-                    sh 'docker push my_image_name'
-                }
+                sh 'docker system prune -f'
+               // sh 'docker rmi samarchieb/frontend:latest'
+               // sh 'docker rmi samarchieb/backend:latest'
+                sh 'docker logout'
             }
         }
-        stage('Deploy') {
-            steps {
-                sh 'kubectl apply -f k8s/deployment.yaml'
-            }
-        }
+         
     }
+
 }
