@@ -5,7 +5,7 @@ pipeline {
     stage('Checkout') {
       steps {
         script {
-           git branch: 'main', credentialsId: '11ecbb15-1242-43df-ba66-a0ed2a56c85a', url: 'https://github.com/achrafYAAKOUB/CHAYAANI.git'
+           git branch: 'main', credentialsId: 'SAMAR', url: 'https://github.com/samarchieb/devops.git'
            sh "ls -lart ./*"  
            sh "git branch -a"
           }
